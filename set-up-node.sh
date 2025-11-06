@@ -36,7 +36,7 @@ fi
 
 # Tanya hostname untuk node ini
 echo ""
-read -p "Masukkan hostname untuk node ini (master1/master2/worker1/worker2): " NODE_HOSTNAME
+read -p "Masukkan hostname untuk node ini (k8s-master-1/k8s-master-2/k8s-worker-1/k8s-worker-2): " NODE_HOSTNAME
 hostnamectl set-hostname $NODE_HOSTNAME
 print_info "Hostname diset menjadi: $NODE_HOSTNAME"
 
@@ -54,11 +54,22 @@ EOF
 
 print_warning "Pastikan IP address di /etc/hosts sudah sesuai dengan environment Anda!"
 echo ""
-read -p "Lanjutkan? (y/n): " CONTINUE
-if [ "$CONTINUE" != "y" ]; then
-    print_info "Setup dibatalkan"
-    exit 0
-fi
+cat /etc/hosts
+echo ""
+read -p "Apakah /etc/hosts sudah sesuai? (y/n/edit): " HOSTS_CHECK
+case $HOSTS_CHECK in
+    y)
+        print_info "Melanjutkan setup..."
+        ;;
+    edit)
+        print_info "Silakan edit /etc/hosts terlebih dahulu"
+        nano /etc/hosts  # atau vi /etc/hosts
+        ;;
+    *)
+        print_info "Setup dibatalkan"
+        exit 0
+        ;;
+esac
 
 # Update system
 print_info "Updating system..."
